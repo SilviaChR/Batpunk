@@ -1,0 +1,230 @@
+---
+title: "Untitled"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+se hizo una  simulcion para el  habiat de de los grupos, para esto se creo una fucion que contiene  en numero de grupos , el numero de individuos de cada grupo, y el numero de hojas.
+```{r Hábitat}
+
+sim_habitat <- function(n_groups, n_indiv, n_leaves = 3000, steps = 10000, sig2 = 0.7, plot = TRUE, xlim = c(0, 300), ylim = c(0, 200)) {
+
+
+  if (n_leaves >= steps){
+    cat(crayon::green(' Alto no sepuede tener más hojas que steps\n'))
+  stop()
+}
+  
+t <- 0:steps  # saltos de tiempo 
+
+## first, simulate a set of random deviates
+x <- rnorm(n = length(t) - 1, sd = sqrt(sig2))
+
+## now compute their cumulative sum
+cx <- c(0, cumsum(x))
+# plot(t, cx, type = "l", ylim = range(cx))
+
+
+y <- rnorm(n = length(t) - 1, sd = sqrt(sig2))
+## now compute their cumulative sum
+cy <- c(0, cumsum(y))
+
+sel_positions_x <- cumsum((rbinom(n_leaves, size = 2, prob = 0.1) * 400) + 50)
+sel_positions_y <- cumsum((rbinom(n_leaves, size = 2, prob = 0.1) * 400) + 50)
+
+sel_positions_x <- (sel_positions_x / max(sel_positions_x)) * steps
+sel_positions_y <- (sel_positions_y / max(sel_positions_y)) * steps
+
+slxs <- cx[sel_positions_x]
+slys <- cy[sel_positions_y]
+
+slxs <- slxs + abs(min(slxs))
+slxs <- (slxs / max(slxs)) * xlim[2]
+slys <- slys + abs(min(slys))
+slys <- (slys / max(slys)) * ylim[2]
+
+
+coor_df <- data.frame(lon= slxs, lat = slys)
+
+if (plot)
+plot(coor_df$lon, coor_df$lat, pch = 20, col = adjustcolor("green", alpha.f = 0.3), xlim = xlim + c(-10, 10), ylim = ylim + c(-10, 10))
+
+
+return(coor_df)
+}
+
+sim_home_range <- function(leaf_coors, groups, radius_constant = 6){
+  
+    if (groups >= nrow(leaf_coors)){
+    cat(crayon::green('No se puede tener más grupos q hojas \n'))
+  stop()
+}
+  
+  group_sizes <- rbinom(n = groups, 10, prob = 0.6)
+
+  # Muestreo de hojas, se ecoje de  manera aleatoria una hoja  para cada  grupo  de murcielagos. partir de ahi se  calculan todas las distancias posibles con otras  hojas y  se  seleccionan aleatoriamente en un radio   un número de hojas 
+  leaves <- sample(1:nrow(leaf_coors), length(group_sizes))
+
+  centers <- leaf_coors[leaves, ]  
+  
+  centers$group_size <- group_sizes
+
+  centers$leaves <- leaves
+  
+  # Se calculan todas las distancias posibles entre la hoja central 
+  dist_leaves <- as.matrix(dist(leaf_coors))
+  
+  group_leaves_l <- lapply(1:nrow(centers), function(x){
+    
+    dists_to_center <- dist_leaves[centers$leaves[x], ]
+     # se seleccionan las hojas  cuya distancia al centro sea menor que el tamaño del grupo multiplicado por un radio constante 
+    selec_leaves <- dists_to_center[dists_to_center < centers$group_size[x] * radius_constant] 
+    
+    # Se crea un data frame de las hojas selecionadas y sus respectivas coordenadas 
+    selec_leaves_df <- leaf_coors[names(selec_leaves), ]
+    
+    selec_leaves_df$leaf_id <- names(selec_leaves)
+    
+    selec_leaves_df$dist_to_center <- selec_leaves
+    
+    selec_leaves_df$group_size <- centers$group_size[x]
+    
+    selec_leaves_df$id <- x
+    
+    return(selec_leaves_df)
+    
+  })
+  group_leaves <- do.call(rbind, group_leaves_l)
+  
+ return(group_leaves)
+}
+
+get_home_range <- function(X, percent = 95){
+  
+  Y <- SpatialPointsDataFrame(X[, c("lat", "lon")], as.data.frame(X$id))
+
+  ud <- try(kernelUD(Y), silent = TRUE)
+  
+  areas <- unlist(as.data.frame(kernel.area(ud, percent = percent))[1,, drop = TRUE])
+  
+  areas_df <- data.frame(group = 1:length(areas), area = areas, group_size = sapply(unique(X$id), function(e) X$group_size[X$id == e][1]))
+
+  return(areas_df)
+}
+
+resample_leaves <- function(X, n = 30){
+  
+  out <- lapply(unique(X$id), function(x){
+    
+    Y <- X[X$id == x, ]
+    
+    if (nrow(Y) > n) 
+      Y <- Y[sample(1:nrow(Y), n), ]
+    
+    return(Y)
+    
+  })
+  
+  return(do.call(rbind, out))
+  
+}
+
+```
+
+
+```{r}
+
+library(adehabitatHR)
+
+leaf_coors <- sim_habitat(n_leaves = 1000, plot = FALSE)
+
+sims <- sim_home_range(leaf_coors = leaf_coors, groups = 11, radius_constant = 6)
+
+tab <- table(sims$id)
+
+sims <- sims[!sims$id %in% names(tab[tab < 5]), ]
+
+range_and_size <- get_home_range(X = sims)
+
+
+mod <- lm(area ~ group_size, data = range_and_size)
+summary(mod)
+
+plot(range_and_size$group_size, range_and_size$area)
+
+abline(mod, col = "red")
+
+resamp_sims <- resample_leaves(sims, n = 30)
+
+
+table(resamp_sims$id)
+
+
+resample_range_and_size <- get_home_range(X = resamp_sims)
+
+
+mod2 <- lm(area ~ group_size, data = resample_range_and_size)
+summary(mod2)
+
+plot(resample_range_and_size$group_size, resample_range_and_size$area)
+
+abline(mod2, col = "red")
+
+
+```
+
+```{r}
+
+ 
+  # dist_leaves[dist_leaves == 0] <- NA
+  # 
+  # sel_leaf <- 1
+  # 
+  # 
+  # group_size <- rbinom(30, 10, 0.5) + 1
+  # group_range_prob <- (group_size / max(group_size)) / 4
+  # 
+  # groups <- 10
+  # cols <- viridis::viridis(groups, alpha = 0.6)
+  # 
+  # for(e in 1:10){
+  # 
+  #   if (e == 1)
+  #   sl <- sel_leaf <- sample(1:nrow(leaf_coors), 1) else {
+  # 
+  #     disp_leaves <- dist_leaves[sel_leaf, ]
+  #     disp_leaves <- disp_leaves[disp_leaves > quantile(disp_leaves, 0.1, na.rm = TRUE)]
+  # 
+  #     sl <- sel_leaf <- sample(names(disp_leaves), 1)
+  #     }
+  # 
+  #   # initial group leaf
+  #   points(leaf_coors[sel_leaf, ], pch = 20, cex = 5, col = adjustcolor("white", alpha.f = 0.8))
+  #   text(leaf_coors[sel_leaf, ], labels = e, cex = 2, adj = c(0.5, 0.5))
+  # 
+  #   for(i in 1:29){
+  # 
+  #     disp_leaves <- dist_leaves[sel_leaf, ]
+  #     disp_leaves <- disp_leaves[disp_leaves < quantile(disp_leaves, group_range_prob[e] , na.rm = TRUE)]
+  # 
+  #     sel_leaf <- NA
+  #     while(is.na(sel_leaf))
+  #     sel_leaf <- picked_leave <- sample(names(disp_leaves), 1)
+  # 
+  #   # picked_leave <- sample(names(sort(dist_leaves[sel_leaf, ]))[1:30], 1)
+  # 
+  #   points(leaf_coors[picked_leave,], col = cols[e])
+  # 
+  #  # sel_leaf <- picked_leave
+  #   }
+  #   # initial group leaf
+  #   points(leaf_coors[sl, ], pch = 20, cex = 5, col = adjustcolor("white", alpha.f = 0.5))
+  #   text(leaf_coors[sl, ], labels = e, cex = 2, adj = c(0.5, 0.5), col = "gray40")
+  # 
+  # Sys.sleep(0.1)
+  #   }
+
+
+```
+

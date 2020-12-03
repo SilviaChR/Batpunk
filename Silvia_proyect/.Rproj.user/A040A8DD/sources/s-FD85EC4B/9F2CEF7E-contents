@@ -22,7 +22,9 @@ knitr::opts_chunk$set(echo = TRUE)
 # Titulo 
 
 *Thyroptera tricolor* es una  especie de murciélago que forma grupos sociales mixtos para refugiarse. Ésta especie utiliza hojas tubulares en crecimiento del orden zingiberales para refugiarse y al ser este un refugio efímero, obliga a sus ocupantes a buscar un nuevo refugio todos los días. Estudios anteriores han demostrado que los grupos de *T.tricolor* mantienen  pequeños ámbitos de hogar con alta disponibilidad de refugios, además poca o ninguna interacción entre individuos de distinto grupo dentro de un mismo refugio. Por lo anterior se ha sugerido que ésta especie de murciélago presenta patrones de territoriales en relación al uso  de los refugios, sin embargo  hasta la fecha no existe  ningún estudio en el que se ponga a prueba dicha hipótesis. 
-Para este  proyecto de investigación  estudiaré el efecto que  tiene la disponibilidad de refugios  en la distribución espacial de los grupos de T. tricolor mediante la simulación de datos. Específicamente estimaré los ámbitos de descanso para diferentes grupos, además  determinaré la distribución y abundancia de refugios disponibles para cada grupo. Luego a partir de los resultados generados determinaré el efecto del tamaño del grupo sobre el tamaño de los ámbitos de descanso. Por último voy a poner a  prueba la existencia de territorialidad en relación al uso de los refugios disponibles, calculando la superposición de ámbitos de descanso entre los grupos.
+Para este  proyecto de investigación  estudiaré el efecto que  tiene la disponibilidad de refugios  en la distribución espacial de los grupos de T. tricolor mediante la simulación de datos. 
+
+Específicamente estimaré los ámbitos de descanso para diferentes grupos, además  determinaré la distribución y abundancia de refugios disponibles para cada grupo. Luego a partir de los resultados generados determinaré el efecto del tamaño del grupo sobre el tamaño de los ámbitos de descanso. Por último voy a poner a  prueba la existencia de territorialidad en relación al uso de los refugios disponibles, calculando la superposición de ámbitos de descanso entre los grupos.
 
 # Hipótesis  y  predicciones 
 
@@ -30,7 +32,7 @@ Para este  proyecto de investigación  estudiaré el efecto que  tiene la dispon
 Los grupos más numerosos de *T.tricolo*, al igual que  otras especies de mamíferos sociales territoriales, ocupan ámbitos de descanso  más grandes y con mayor cantidad de recursos, ya que al ser más numerosos pueden defender mejor  un área.
 
 Si *T. tricolor* es una especie territorial, espero encontrar : 
-
+I
 **Predicción I:**  A densidades intermedias de refugios en el ambiente, los grupos de *T. tricolor* presentarán poca superposición de ámbitos de descanso 
 
 **Predicción II:** Entre más grande sea el grupo mayor será el ámbito de descanso y mayor la cantidad de refugios en el mismo.
@@ -38,10 +40,9 @@ Si *T. tricolor* es una especie territorial, espero encontrar :
 
 # Simulación de datos espaciales 
 
-## Grupos
-## Refugios
+## Grupos 
+## 
 
-# Análisis
 
 ### Determinación de Ámbitos de descanso
 
@@ -71,10 +72,9 @@ Voy a medir y comparar la densidad de refugios disponibles diariamente para cada
 
 Cuarto modelo Voy a comparar el efecto de la densidad de refugios en el porcentaje de superposición de ámbitos de descanso entre los grupos. Para a aplicar un modelo lineal mixto generalizado , utilizando  el paquete  estadístico “glmm”  de R. Tomaré  como variable dependiente el porcentaje de superposición de ámbitos de descanso, mientras que las variables independientes serán el tamaño de los grupos y la identidad de los grupos, utilizando esta última como una variable aleatoria y utilizaré la densidad de refugios como la covariable del modelo
 
+# Análisis 
 
 
-
- 
 ---
 
 ```{r include=FALSE}

@@ -11,7 +11,7 @@
 
 <meta name="author" content="Silvia Chaves-Ramírez" />
 
-<meta name="date" content="2020-11-27" />
+<meta name="date" content="2020-12-02" />
 
 <title>Proyecto Final</title>
 
@@ -2792,22 +2792,150 @@ div.tocify {
 
 <h1 class="title toc-ignore">Proyecto Final</h1>
 <h4 class="author">Silvia Chaves-Ramírez</h4>
-<h4 class="date">2020-11-27</h4>
+<h4 class="date">2020-12-02</h4>
 
 </div>
 
 
 <div id="titulo" class="section level1">
 <h1>Titulo</h1>
-<p><em>Thyroptera tricolor</em> es una especie de murciélago que forma grupos sociales mixtos para refugiarse. Ésta especie utiliza hojas tubulares en crecimiento del orden zingiberales para refugiarse y al ser este un refugio efímero, obliga a sus ocupantes a buscar un nuevo refugio todos los días. Estudios anteriores han demostrado que los grupos de <em>T.tricolor</em> mantienen pequeños ámbitos de hogar con alta disponibilidad de refugios, además poca o ninguna interacción entre individuos de distinto grupo dentro de un mismo refugio. Por lo anterior se ha sugerido que ésta especie de murciélago presenta patrones de territoriales en relación al uso de los refugios, sin embargo hasta la fecha no existe ningún estudio en el que se ponga a prueba dicha hipótesis. Para este proyecto de investigación estudiaré el efecto que tiene la disponibilidad de refugios en la distribución espacial de los grupos de T. tricolor. Específicamente estimaré los ámbitos de descanso para diferentes grupos, además determinaré la distribución y abundancia de refugios disponibles para cada grupo. Luego a partir de los resultados generados determinaré el efecto del tamaño del grupo sobre el tamaño de los ámbitos de descanso. Por último voy a poner a prueba la existencia de territorialidad en relación al uso de los refugios disponibles, calculando la superposición de ámbitos de descanso entre los grupos.</p>
+<p><em>Thyroptera tricolor</em> es una especie de murciélago que forma grupos sociales mixtos para refugiarse. Ésta especie utiliza hojas tubulares en crecimiento del orden zingiberales para refugiarse y al ser este un refugio efímero, obliga a sus ocupantes a buscar un nuevo refugio todos los días. Estudios anteriores han demostrado que los grupos de <em>T.tricolor</em> mantienen pequeños ámbitos de hogar con alta disponibilidad de refugios, además poca o ninguna interacción entre individuos de distinto grupo dentro de un mismo refugio. Por lo anterior se ha sugerido que ésta especie de murciélago presenta patrones de territoriales en relación al uso de los refugios, sin embargo hasta la fecha no existe ningún estudio en el que se ponga a prueba dicha hipótesis. Para este proyecto de investigación estudiaré el efecto que tiene la disponibilidad de refugios en la distribución espacial de los grupos de T. tricolor mediante la simulación de datos.</p>
+<p>Específicamente estimaré los ámbitos de descanso para diferentes grupos, además determinaré la distribución y abundancia de refugios disponibles para cada grupo. Luego a partir de los resultados generados determinaré el efecto del tamaño del grupo sobre el tamaño de los ámbitos de descanso. Por último voy a poner a prueba la existencia de territorialidad en relación al uso de los refugios disponibles, calculando la superposición de ámbitos de descanso entre los grupos.</p>
 </div>
 <div id="hipótesis-y-predicciones" class="section level1">
 <h1>Hipótesis y predicciones</h1>
 <p><em>Thyroptera tricolor</em> podría ser una especie territorial, debido a que los grupos mantienen poca superposición entre sus ámbitos de descanso. Los grupos más numerosos de <em>T.tricolo</em>, al igual que otras especies de mamíferos sociales territoriales, ocupan ámbitos de descanso más grandes y con mayor cantidad de recursos, ya que al ser más numerosos pueden defender mejor un área.</p>
-<p>Si <em>T. tricolor</em> es una especie territorial, espero encontrar :</p>
-<p><strong>Predicción I:</strong> A densidades intermedias de refugios en el ambiente, los grupos de <strong>T. tricolor</strong> presentarán poca superposición de ámbitos de descanso</p>
+<p>Si <em>T. tricolor</em> es una especie territorial, espero encontrar : I <strong>Predicción I:</strong> A densidades intermedias de refugios en el ambiente, los grupos de <em>T. tricolor</em> presentarán poca superposición de ámbitos de descanso</p>
 <p><strong>Predicción II:</strong> Entre más grande sea el grupo mayor será el ámbito de descanso y mayor la cantidad de refugios en el mismo.</p>
-<hr />
+</div>
+<div id="simulación-de-datos-espaciales" class="section level1">
+<h1>Simulación de datos espaciales</h1>
+<div id="grupos" class="section level2">
+<h2>Grupos</h2>
+</div>
+<div id="section" class="section level2">
+<h2></h2>
+<div id="determinación-de-ámbitos-de-descanso" class="section level3">
+<h3>Determinación de Ámbitos de descanso</h3>
+<p>Para obtener los ámbitos de descanso para cada grupo de murciélagos, voy a aplicar el método de Estimación de densidad de Kernel del paquete “aldeHabitatHR” de R. Utilizaré la función ‘r kernelUD’</p>
+<p>Voy a usar la opción “plotLSCV” que emplea el método de validación cruzada de mínimos cuadrados para encontrar el mejor valor suavizado del ancho de banda (argumento “h”), para un kernel normal bivariado.</p>
+<p>Porcentaje de superposición entre ámbitos de descanso (%SAD) Cuando el 50 % del UD de un grupo esta superpuesto con el UD de otro grupo</p>
+</div>
+<div id="tamaño-grupo-vs-tamaño-del-ámbito-de-descanso" class="section level3">
+<h3>Tamaño Grupo vs Tamaño del Ámbito de descanso</h3>
+<p>primer modelo voy a usar como variable respuesta el tamaño de ámbito de descanso y como variable fija el tamaño del grupo y como variable aleatoria la identidad del grupo</p>
+<p>segundo modelo voy a usar como variable respuesta el porcentaje de superposición de ámbitos de descanso y como variable fija el tamaño del grupo y como variable aleatoria la identidad del grupo.</p>
+</div>
+<div id="disponibilidad-de-refugios" class="section level3">
+<h3>Disponibilidad de refugios</h3>
+<p>Voy a medir y comparar la densidad de refugios disponibles diariamente para cada grupo según su tamaño.</p>
+<p>Útilizare como variable fija el tamaño del grupo y como variable aleatoria la identidad del grupo. (Densidad de hojas ~ Tamaño del grupo + identidad del grupo (variable aleatoria))</p>
+<p>Cuarto modelo Voy a comparar el efecto de la densidad de refugios en el porcentaje de superposición de ámbitos de descanso entre los grupos. Para a aplicar un modelo lineal mixto generalizado , utilizando el paquete estadístico “glmm” de R. Tomaré como variable dependiente el porcentaje de superposición de ámbitos de descanso, mientras que las variables independientes serán el tamaño de los grupos y la identidad de los grupos, utilizando esta última como una variable aleatoria y utilizaré la densidad de refugios como la covariable del modelo</p>
+</div>
+</div>
+</div>
+<div id="código-de-simulación" class="section level1">
+<h1>Código de simulación</h1>
+<p><strong>Simulación de hábitat para grupos de <em>T.tricolor</em>. </strong></p>
+<p>Para simular y aleatorizar datos que parecieran al patrón de distribución de hojas disponibles como refugios y las ubicaciones de grupos de <em>T.tricolor</em> en la naturaleza, apliqué un movimiento Browniano estandar. como se detalla a continuación</p>
+<pre class="r"><code># En esta función se  crean las variables  para el número de grupos,  número de individuos por grupo, número de hojas  dentro de  un área de 200 x 300 m2.  
+
+sim_habitat &lt;- function(n_groups, n_indiv, n_leaves = 3000, steps = 10000, sig2 = 0.7, plot = TRUE, xlim = c(0, 300), ylim = c(0, 200)) {
+
+
+  if (n_leaves &gt;= steps){
+    cat(crayon::green(&#39; Alto ahí, puede tener más hojas que steps\n&#39;))
+  stop()
+}
+  
+t &lt;- 0:steps  # Saltos de tiempo 
+
+## Primero, se crea un set simulación de desviaciones con σ2= 0.7, para los valores de x
+x &lt;- rnorm(n = length(t) - 1, sd = sqrt(sig2))
+
+## Ahora se  calcula la suma acumulada de las desviaciones 
+cx &lt;- c(0, cumsum(x))
+# plot(t, cx, type = &quot;l&quot;, ylim = range(cx))
+
+## Se repiten los dos pasos anteriores para los valores de y
+y &lt;- rnorm(n = length(t) - 1, sd = sqrt(sig2))
+## suma acumulada de las desviaciones para valores de y
+cy &lt;- c(0, cumsum(y))
+
+# Simulación de hojas disponibles como refugios
+
+sel_positions_x &lt;- cumsum((rbinom(n_leaves, size = 2, prob = 0.1) * 400) + 50)
+sel_positions_y &lt;- cumsum((rbinom(n_leaves, size = 2, prob = 0.1) * 400) + 50)
+
+sel_positions_x &lt;- (sel_positions_x / max(sel_positions_x)) * steps
+sel_positions_y &lt;- (sel_positions_y / max(sel_positions_y)) * steps
+
+slxs &lt;- cx[sel_positions_x]
+slys &lt;- cy[sel_positions_y]
+
+slxs &lt;- slxs + abs(min(slxs))
+slxs &lt;- (slxs / max(slxs)) * xlim[2]
+slys &lt;- slys + abs(min(slys))
+slys &lt;- (slys / max(slys)) * ylim[2]
+
+# Obtenemos las coordenadas  para el número de hojas disponibles como refugio
+coor_df &lt;- data.frame(lon= slxs, lat = slys)
+
+if (plot)
+plot(coor_df$lon, coor_df$lat, pch = 20, col = adjustcolor(&quot;green&quot;, alpha.f = 0.3), xlim = xlim + c(-10, 10), ylim = ylim + c(-10, 10))
+
+
+return(coor_df)
+}</code></pre>
+<p>Simulación de ámbitos de descanso</p>
+<pre class="r"><code>#Función ubicaión de grupos 
+
+# Simular las coordenadas de ubicación para 10 grupos de murciélagos 
+sim_home_range &lt;- function(leaf_coors, groups, radius_constant = 6){
+  
+    if (groups &gt;= nrow(leaf_coors)){
+    cat(crayon::green(&#39;No se puede tener más grupos q hojas \n&#39;))
+  stop()
+}
+  # Determinamos el tamaño  para los 10 grupos, usamos una probabilidaded 0.6 para que los tamaños de grupo tengan  sentido segun lo visto  en la naturaleza 
+  group_sizes &lt;- rbinom(n = groups, 10, prob = 0.6)
+ 
+  # extraemos una hoja central para cada grupo  
+  leaves &lt;- sample(1:nrow(leaf_coors), length(group_sizes))
+# obtenemos  las coordenanadas para cada hoja central 
+  centers &lt;- leaf_coors[leaves, ]  
+  
+  centers$group_size &lt;- group_sizes
+
+  centers$leaves &lt;- leaves
+  
+  # Se calculan todas las distancias posibles entre la hoja central  mediante una matris de distancia  entre las hojas disponibles.
+  dist_leaves &lt;- as.matrix(dist(leaf_coors))
+  
+  group_leaves_l &lt;- lapply(1:nrow(centers), function(x){
+    
+    dists_to_center &lt;- dist_leaves[centers$leaves[x], ]
+     # se seleccionan las hojas  cuya distancia al centro sea menor que el tamaño del grupo multiplicado por un radio constante 
+    selec_leaves &lt;- dists_to_center[dists_to_center &lt; centers$group_size[x] * radius_constant] 
+    
+    # Se crea un data frame de las hojas selecionadas y sus respectivas coordenadas 
+    selec_leaves_df &lt;- leaf_coors[names(selec_leaves), ]
+    
+    selec_leaves_df$leaf_id &lt;- names(selec_leaves)
+    
+    selec_leaves_df$dist_to_center &lt;- selec_leaves
+    
+    selec_leaves_df$group_size &lt;- centers$group_size[x]
+    
+    selec_leaves_df$id &lt;- x
+    
+    return(selec_leaves_df)
+    
+  })
+  group_leaves &lt;- do.call(rbind, group_leaves_l)
+  
+ return(group_leaves)
+}</code></pre>
 </div>
 
 
