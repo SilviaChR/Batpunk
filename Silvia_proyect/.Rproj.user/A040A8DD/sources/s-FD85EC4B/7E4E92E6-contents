@@ -119,6 +119,7 @@ Para simular datos aleatorios que similares al patrón  de distribución de hoja
 # Se cargan los paquetes necesarios para los análisis  
 
 library(adehabitatHR) # Home Range Estimation 
+library(ggplot2)
 
 ```
  
@@ -127,24 +128,24 @@ Funciones:
 Simulación de Hábitat  
 
 ```{r Habitat}
-#En esta función se crean las variables para el número de grupos,  número de individuos por grupo, número de hojas  dentro de  un área de 200 x 300 m2.  
+#En esta función  es para generar las hojas disponibles como refugios dentro de  un área de 200 x 300 m2. También crean las variables para el número de grupos,  número de individuos por grupo   
 
 sim_habitat <- function(n_groups, n_indiv, n_leaves = 3000, steps = 10000, sig2 = 0.7, plot = TRUE, xlim = c(0, 300), ylim = c(0, 200)) {
 
 
   if (n_leaves >= steps){
-    cat(crayon::green(' Alto ahí, puede tener más hojas que steps\n'))
+    cat(crayon::green(' Alto ahí, no se puede tener más hojas que steps\n'))
   stop()
 }
   
-t <- 0:steps  # Saltos de tiempo 
+t <- 0:steps  # Saltos de tiempo  en el que varia la distribución de hojas en el espacio
 
 ## Primero, se crea un set simulación de desviaciones con σ2= 0.7, para los valores de x
 x <- rnorm(n = length(t) - 1, sd = sqrt(sig2))
 
 ## Ahora se  calcula la suma acumulada de las desviaciones 
 cx <- c(0, cumsum(x))
-# plot(t, cx, type = "l", ylim = range(cx))
+ plot(t, cx, type = "l", ylim = range(cx))
 
 ## Se repiten los dos pasos anteriores para los valores de y
 y <- rnorm(n = length(t) - 1, sd = sqrt(sig2))
@@ -162,19 +163,20 @@ sel_positions_y <- (sel_positions_y / max(sel_positions_y)) * steps
 slxs <- cx[sel_positions_x]
 slys <- cy[sel_positions_y]
 
+# Obtenemos las coordenadas  para el número de hojas disponibles como refugio dentro de los limites del área de estudio  200 x300 m2
 slxs <- slxs + abs(min(slxs))
 slxs <- (slxs / max(slxs)) * xlim[2]
 slys <- slys + abs(min(slys))
 slys <- (slys / max(slys)) * ylim[2]
 
-# Obtenemos las coordenadas  para el número de hojas disponibles como refugio
+# Se guardan las coordenadas de las hojas en  un data frame
 coor_df <- data.frame(lon= slxs, lat = slys)
 
 if (plot)
 plot(coor_df$lon, coor_df$lat, pch = 20, col = adjustcolor("green", alpha.f = 0.3), xlim = xlim + c(-10, 10), ylim = ylim + c(-10, 10))
 
 
-return(coor_df)
+return() ## coor_df
 }
 
 ```
@@ -199,7 +201,7 @@ ubi_groups <- function(leaf_coors, groups, radius_constant = 6){
   
   centers$group_size <- group_sizes
 
-  centers$leaves <- leaves
+  centers$leaves <- leaves # todas  estas hojas pertencen al los ambitos de  descanso de  un grupo.
   
 # Se calculan todas las distancias posibles entre la hoja central  mediante una matriz de distancia  entre las hojas disponibles.
   dist_leaves <- as.matrix(dist(leaf_coors))
@@ -208,7 +210,7 @@ ubi_groups <- function(leaf_coors, groups, radius_constant = 6){
     
     dists_to_center <- dist_leaves[centers$leaves[x], ]
     
-# Se seleccionan las hojas  cuya distancia al centro sea menor que el tamaño del grupo multiplicado por un radio constante  
+# Se seleccionan las hojas  cuya distancia al centro sea menor que el tamaño del grupo multiplicado por un radio constante,  
     selec_leaves <- dists_to_center[dists_to_center < centers$group_size[x] * radius_constant] 
     
 # Se crea un data frame de las hojas selecionadas y sus respectivas coordenadas 
@@ -235,7 +237,7 @@ ubi_groups <- function(leaf_coors, groups, radius_constant = 6){
 
 Función:
 ```{r}
-#Función para obtener  las las coordenadad necesarias para estimar los ámbitos de descanso para cada grupo,  con un 95% de confianza .
+#Función para obtener  determinar estimar los ámbitos de descanso para cada grupo,  con un 95% de confianza .
 
 get_home_range <- function(X, percent = 95){
   
@@ -251,7 +253,7 @@ get_home_range <- function(X, percent = 95){
 }
 
 
-### NO RECUERDO BIEN QUE PASO ACÁ
+### Esta  funcion es para  haces  un submuestreo y confirmar  si  el resultado  mantiene  el mismo patron 
 resample_leaves <- function(X, n = 30){
   
   out <- lapply(unique(X$id), function(x){
@@ -273,14 +275,14 @@ resample_leaves <- function(X, n = 30){
 Estimación de ámbitos de descanso 
 
 ```{r}
-#Home Range Estimation
+# Se asume que las  coordenadas simuladas son hojas utilizadas  por los grupos (ubicación de grupos en refugios) 
 
 leaf_coors <- sim_habitat(n_leaves = 1000, plot = FALSE)
 
 sims <- ubi_groups(leaf_coors = leaf_coors, groups = 10, radius_constant = 6)
 
 tab <- table(sims$id)
-## este Tab para que era ???
+## Esto es para obtener el numero de hojas  que  hay en cada territorio 
 sims <- sims[!sims$id %in% names(tab[tab < 5]), ]
 
 #  Se crea un set de datos  que contiene el área del ámbito de descanso y el numero de individuos para cada grupo 
@@ -296,15 +298,23 @@ Para ver  el efecto  que tiene  el tamalo  del grupo  sobre el tamaño de los am
 mod <- lm(area ~ group_size, data = range_and_size)
 summary(mod)
 
-plot(range_and_size$group_size, range_and_size$area)
+#plot(range_and_size$group_size, range_and_size$area)
 
-abline(mod, col = "red")
+#abline(mod, col = "red")
+
+ggplot(range_and_size, aes(group_size, area)) +
+ geom_point(aes(group_size, area)) +
+ geom_smooth(method ="lm") +
+ xlab("Número de individuos") + 
+ ylab("Tamaño del ámbito de descanso") +
+ scale_color_gradient() +
+ theme_bw()
 ```
 
-Luego  se puso a prueba la simulación 
+Luego  
 
 ```{r}
-resamp_sims <- resample_leaves(sims, n = 30)
+resamp_sims <- resample_leaves(sims, n = 45)
 
 
 table(resamp_sims$id)
@@ -316,11 +326,17 @@ resample_range_and_size <- get_home_range(X = resamp_sims)
 mod2 <- lm(area ~ group_size, data = resample_range_and_size)
 summary(mod2)
 
-plot(resample_range_and_size$group_size, resample_range_and_size$area)
+#plot(resample_range_and_size$group_size, resample_range_and_size$area)
 
-abline(mod2, col = "red")
+#abline(mod2, col = "red")
 
-
+ggplot(resample_range_and_size, aes(group_size, area)) +
+ geom_point(aes(group_size, area)) +
+ geom_smooth(method ="lm") +
+ xlab("Número de individuos") + 
+ ylab("Tamaño del ámbito de descanso") +
+ scale_color_gradient() +
+ theme_bw()
 ```
 
 ```{r}
@@ -376,6 +392,7 @@ abline(mod2, col = "red")
 
 
 ```
+# Referencias 
 
 ```{r  include=FALSE}
 sessionInfo()

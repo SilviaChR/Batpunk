@@ -1,24 +1,24 @@
 {
-    "id": "BCEC53C0",
+    "id": "BDD1A57A",
     "path": "~/Ciencia _rep/Silvia_Proyectofinal_CienciaRep/Silvia_proyect/scripts/Silvia_R.R",
     "project_path": "scripts/Silvia_R.R",
     "type": "r_source",
-    "hash": "2211670892",
+    "hash": "0",
     "contents": "",
     "dirty": false,
-    "created": 1606969867759.0,
+    "created": 1607037590058.0,
     "source_on_save": false,
-    "relative_order": 3,
+    "relative_order": 2,
     "properties": {
-        "cursorPosition": "205,0",
-        "scrollLine": "192"
+        "cursorPosition": "69,29",
+        "scrollLine": "52"
     },
     "folds": "",
     "lastKnownWriteTime": 1606972387,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1606972387349,
+    "last_content_update": 1606972387,
     "read_only": false,
     "read_only_alternatives": []
 }
