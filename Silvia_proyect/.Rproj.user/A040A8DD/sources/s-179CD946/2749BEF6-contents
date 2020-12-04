@@ -1,0 +1,463 @@
+---
+title: "P.pajaritus_CMH-I"
+author: "Andrea Arriaga-Madrigal, Paula Iturralde  y Silvia Chaves"
+date:  "`r Sys.Date()`"
+output:
+  html_document:
+    fig_caption: yes
+    number_sections: no
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    df_print: paged
+editor_options: 
+  chunk_output_type: console
+---
+
+Para acceder  al repositorio de github de este proyecto seleccione [aquí](https://github.com/andreaarriaga/P.pajaritus_CMH-I.git)
+
+```{r, include = FALSE, message=FALSE, warning=FALSE}
+
+library(lme4)
+library(ggplot2)
+library(gridExtra)
+require(lme4)
+require(nlme)
+require(sjPlot)
+require(sjlabelled)
+require(sjmisc)
+require(jtools)
+library(glmm)
+datos <- read.csv("Datos_tarea4.csv", header = TRUE)
+
+
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+
+
+require(ggdag)
+
+dagified <- dagify(D ~ H,
+                   D ~ L,
+                   H ~ L,
+                   exposure = "H",
+                   outcome = "D")
+
+ggdag(dagified, layout = "circle") + theme_dag()
+
+
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+tidy_dagitty(dagified)
+
+```
+**Figura 1.** Diagrama causal del sistema de estudio
+
+## Visualizar datos
+
+Relación entre los tipos de degradación de hábitat y la diversidad de alelos
+
+```{r, echo=FALSE, fig.align='center', fig.width=10, fig.height=6,fig.show='hold', dpi = 500}
+#Visualize data
+
+D = ggplot() + 
+  geom_point(data = datos, aes(D, H1), color = "brown3")+
+  geom_point(data = datos, aes(D, H2), color = "darkgreen")+
+  geom_point(data = datos, aes(D, H3), color = "cyan4")+
+  geom_point(data = datos, aes(D, H4), color = "coral1")+
+  geom_point(data = datos, aes(D, H5), color = "darkorange1")+
+  labs(y="Tipos de Degradacion", x="Diversidad de alelos") +
+  ggtitle("Relacion entre tipos de degradacion y diversidad de alelos")+
+    theme_bw()+
+    theme(plot.title = element_text(hjust = 0.5))
+    
+
+D
+
+
+
+```
+
+Relación entre la latitud y la degradación del hábitat
+
+```{r, echo=TRUE, fig.align='center', fig.width=10, fig.height=6,fig.show='hold', dpi = 500}
+
+
+
+L = ggplot() + 
+  geom_point(data = datos, aes(H1, L), color = "brown3", size = 3, pch = 17)+
+  geom_point(data = datos, aes(H2, L), color = "darkgreen", size = 3, pch = 17)+
+  geom_point(data = datos, aes(H3, L), color = "cyan4", size = 3, pch = 17)+
+  geom_point(data = datos, aes(H4, L), color = "coral1", size = 3, pch = 17)+
+  geom_point(data = datos, aes(H5, L), color = "darkorange1", size = 3, pch = 17)+
+  labs(y="Latitud", x="Tipos de degradación del Hábitat") +
+  ggtitle("Relacion entre tipos de degradación y Latitud")+
+    theme_bw()+
+    theme(plot.title = element_text(hjust = 0.5))
+
+L
+
+
+
+```
+
+&nbsp;
+
+Relación entre la Diversidad de Alelos y la Latitud
+
+
+```{r, echo=TRUE, fig.align='center', fig.width=10, fig.height=6,fig.show='hold', dpi = 500}
+
+
+ggplot() + 
+geom_point(data = datos, aes(y = L, x = D), fill = "chocolate1", color = "black", size = 3, pch = 23)+
+labs(y="Latitud", x="Diversidad de Alelos") +
+  ggtitle("Relación entre Latitud y Diversidad de Alelos")+
+  theme_bw()+
+  theme(plot.title = element_text(hjust = 0.5))
+  
+
+```
+
+
+Gráfico de barras: frecuencia de diversidad
+
+```{r, echo=TRUE, fig.align='center', fig.width=10, fig.height=6,fig.show='hold', dpi = 500}
+
+
+ggplot() + 
+geom_bar(data = datos, aes(D), fill = "darkblue")+
+  labs(y="Frecuencia", x="Diversidad de Alelos") +
+  ggtitle("Disribución de frecuencia de la diversidad de alelos")+
+    theme_bw()+
+    theme(plot.title = element_text(hjust = 0.5))
+
+
+
+
+```
+
+
+## Modelo 1. Silvia 
+
+Se estudió el efecto que tienen diferentes indicadores H de degradación ambiental sobre  diversidad alélica (D) del complejo CMH-I de *P. pajaritus*
+
+Para esto apliqué modelos lineales para ver el efectos de cada indeicador H sobre D
+
+```{r T1,}
+# Para H1
+h1 <- glm(D ~ H1 + A + P + L, data= datos, family = "poisson")
+h1
+S.H1 <- summary(h1)
+S.H1
+
+# Para H2
+h2 <- glm(D ~ H2+ A + P + L, data=datos,family = "poisson")
+
+h2
+S.H2 <- summary(h2)
+S.H2
+# Para H3
+h3 <- glm(D ~ H3+ A + P + L, data=datos,family = "poisson")
+h3
+
+S.H3 <- summary(h3)
+S.H3
+
+# Para H4
+h4 <- glm(D ~ H4+ A + P + L, data=datos, family = "poisson")
+h4
+S.H4 <- summary(h4) 
+S.H4
+
+#Para H5 
+h5 <- glm(D ~ H5+ A + P + L, data=datos, family = "poisson")
+h5
+S.H5 <- summary(h5) 
+S.H5
+```
+
+&nbsp;  
+
+Ahora comparamos los efectos de los indicadores  de degradación 
+
+&nbsp;  
+
+```{r}
+# Se estraen  valor de P  para cada modelo 
+P.H1 <- S.H1$coefficients[2,4]
+P.H2 <- S.H2$coefficients[2,4]
+P.H3 <- S.H3$coefficients[2,4]
+P.H4 <- S.H4$coefficients[2,4]
+P.H5 <- S.H5$coefficients[2,4]
+
+```
+
+&nbsp;  
+
+Creamos un marco de datos con los valores de p  para cada indicador de desgradación ambiental evaluado.
+
+&nbsp;  
+
+
+```{r}
+R <- data.frame("Indicador"= c("H1","H2", "H3", "H4", "H5"), "Valores de P"=c(P.H1, P.H2, P.H3, P.H4, P.H5))
+R
+
+```
+
+&nbsp;  
+
+Visualizamos los datos  
+
+&nbsp;  
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
+p1 <- ggplot(data= datos, aes(x= H1, y= D)) +
+  geom_point() +
+  geom_smooth() + 
+  labs(x="Indicador H1", y="D CMH-I")
+
+p2 <- ggplot(data= datos, aes(x= H2, y= D)) +
+  geom_point() +
+  geom_smooth() + 
+  labs(x="Indicador H2", y="D CMH-I")
+
+p3 <- ggplot(data= datos, aes(x= H3, y= D)) +
+  geom_point() +
+  geom_smooth() + 
+  labs(x="Indicador H3", y="D CMH-I")
+
+p4 <- ggplot(data= datos, aes(x= H4, y= D)) +
+  geom_point() +
+  geom_smooth() + 
+  labs(x="Indicador H4", y="D CMH-I")
+
+p5 <- ggplot(data= datos, aes(x= H5, y= D)) +
+  geom_point() +
+  geom_smooth() + 
+  labs(x="Indicador H5", y="D CMH-I")
+```
+
+
+```{r plo1, echo=TRUE, warning= FALSE, message=FALSE}
+
+grid.arrange(p1, p2, p3, p4, p5, ncol= 2, nrow=3)
+
+```
+
+&nbsp;  
+
+**Fig 2.** Variación de la diversidad alélica del complejo mayor de histocompatibilidad (CMH) clase I, según los indicadores de degradación presentes en el sitio. Las líneas azules representa la tendencia general de los datos para cada indicador y  área sombreada en gris el intervalo de confianza al 95%  
+
+
+&nbsp;  
+
+**Interpretación: ** Como se puede observar en el marco de datos  de los valores de P para cada modelo aplicado, efectivamente encontré que los indicadores de degradación  ambientales H1, H2 , H3, H4 y H5, tiene efectos  significativos  sobre la variación de la D (p<0.05). Entonces podemos concluir que  los indicadores de degradación ambiental  afectan de igual manera  a la diversidad alélica del complejo mayor de histocompatibilidad (CMH) clase I.
+
+
+&nbsp;
+
+---
+
+
+### Corrección Modelo 1. Paula
+
+**Corrección interpretación** En el ejemplo del Modelo 1 se plantea diferentes modelos en los que se controla por separado por cada una de las variables H (de H1 a H5). Esto puede generar un error en la interpretación de resultados ya que caemos en la trampa de comparaciones indirectas. 
+
+No podemos asumir que las variables H sean diferentes entre si ya que lo mas probable es que todas en conjunto tienen un efecto sobre la diversidad de los alelos. Para corregir este error se plantea ahora un modelo en el que se controle por todas las variables H y también por la latitud ya que sabemos que tiene un efecto sobre la latitud.
+
+
+## Modelo 2. Paula
+
+&nbsp;
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+
+
+#Modelo donde controlamos por todas las variables de degradacion (H) y latitud (L)
+
+M.2 <- glm(D ~ H1 + H2 + H3 + H4 + H5 + L, data = datos, family = poisson)
+summary(M.2)
+#summ(M.2)
+
+
+```
+
+&nbsp;
+
+**Interpretación** Los resultados indican que H1, H2 y H4 tienen un efecto significativo sobre la diversidad alélica. Si graficamos los valores estimados vemos que esas tres variables tienen un efecto significativo son las que estan mas alejadas del 0 y que efectivamente su efecto sobre la diversidad alélica es mayor con respecto a las otras dos variables de H.
+
+&nbsp;
+
+
+```{r, echo=TRUE, fig.align='center', fig.width=10, fig.height=6,fig.show='hold', dpi = 500}
+
+
+#plot_model(M.2, colors = "darkblue")
+#plot_model(M.2, transform = "plogis", show.values = TRUE, value.offset = .3, colors = "darkblue")
+plot_summs(M.2, colors = "darkblue")
+
+
+```
+
+&nbsp;
+
+Para visualizar mejor estos resultados voy a generar gráficos independientes para cada variable H de degradación
+
+```{r, figures-side, fig.width=6, fig.height=4,fig.show='hold', out.width="50%", dpi = 500, warning=FALSE, message=FALSE}
+
+require(ggstance)
+require(piecewiseSEM)
+require(broom.mixed)
+
+effect_plot(M.2, pred = H1, interval = TRUE, plot.points = TRUE)
+effect_plot(M.2, pred = H2, interval = TRUE, plot.points = TRUE)
+effect_plot(M.2, pred = H3, interval = TRUE, plot.points = TRUE)
+effect_plot(M.2, pred = H4, interval = TRUE, plot.points = TRUE)
+effect_plot(M.2, pred = H5, interval = TRUE, plot.points = TRUE)
+effect_plot(M.2, pred = L, interval = TRUE, plot.points = TRUE)
+
+
+
+
+```
+
+&nbsp;
+
+**Figura 3.**Modelo 2.Tamaño de efecto
+
+&nbsp;
+
+
+**Nota** Un problema con este modelo es que toma a cada variable independientemente, y es necesario hacer la interaccion. Por lo tanto voy a descartar este modelo para poder tomar en cuenta la interaccion entre todas las variables de degradacion H. 
+
+&nbsp;
+
+## Modelo 3. Paula
+
+&nbsp;
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+
+M.3 <- glm(D ~ H1:H2:H3:H4:H5+L, data = datos, family = poisson())
+summary(M.3)
+
+
+```
+
+&nbsp;
+
+**Interpretación** Estos resultados tienen sentido porque además al hacer la interacción ya encontramos una influencia significativa de la Latitud (L) sobre la  diversidad alélica. La interacción de todos los H presenta un valor de p en el que podemos afirmar que la degradación afecta la diversidad alélica. 
+
+Si graficamos los estimados entonces obtenemos lo siguiente:
+
+&nbsp;
+
+
+```{r, echo=TRUE, fig.align='center', fig.width=10, fig.height=6,fig.show='hold', dpi = 500}
+
+plot_summs(M.3, colors = "darkBlue", plot.distributions = TRUE)
+
+```
+&nbsp;
+
+**Figura 4.** Tamaño de efecto y distribución
+
+&nbsp;
+
+Según este modelo la latitud (L) y la interacción de las variables H tiene una influencia sobre la diversidad alélica. 
+
+---
+
+### Correción modelo 3. Andrea
+
+Si se van a incluir las variables predictoras (H1, H2, H3, H4 y H5) juntas en el modelo, una buena forma de reducción de dimensiones es realizar un análisis de componentes principales. De esta forma se puede calcular el eje de mayor variación atribuido a las variables predictoras en conjunto y asignar un valor a cada observación respecto a su distancia a dicho eje. Esta nueva variable resume la variación dada por todas las H en conjunto y va a ser llamada **"degradación"** (figura. 5).
+
+&nbsp;
+
+```{r}
+# PCA
+Hpca <- princomp(datos[,c("H1", "H2", "H3", "H4", "H5")])
+
+summary(Hpca)
+
+## extrayendo los scrores del primer componente principal para hacerlo una nueva variable que agrupa todas las H
+datos$degradacion <- Hpca$scores[,1]
+```
+
+
+Cuadro 1. Visualización de las primeras seis filas de la base de datos, ahora con la nueva variable "degradación".
+
+```{r , echo= FALSE}
+head(datos)
+```
+
+
+```{r gráfico D vs degradación, echo=FALSE, message=FALSE, warning=FALSE}
+## preparacion de los datos para hacer los graficos
+datos$P <- as.factor(datos$P)
+datos$A <- as.factor(datos$A)
+
+## calculando el promedio por P
+# prom <- aggregate(D ~ P, FUN = mean, data = datos)
+## grafico con los scores del PC1 (degradacion) como variable predictora
+ggplot(datos, aes(degradacion, D )) +
+  geom_point(alpha = 0.4,  show.legend = FALSE) + 
+  geom_smooth(show.legend = FALSE) +
+   theme_bw()
+```
+
+
+
+**Figura 5**. Variación de la diversidad alélica (D), según la degradación presente en el sitio. La línea negra representa la tendencia general de los datos y la banda sombreada el intervalo de confianza al 95%.
+
+&nbsp;
+
+El modelo 3 está incorrecto, ya que presenta la trampa estadística de **inflación de N**, al asumir que todos los datos son parte de la misma muestra. El modelo correcto se lleva a cabo usando la variable **degradación** y la latitud (**L**) como variables predictoras de efectos fijos. Sin embargo, para que el modelo permita observar la variación atribuida a la degradación sin que se vea enmascarada por la variación dada por la población a la que pertenece cada indiviuo (figura.6) o al año en que fueron tomados estos datos, es necesario incluir ambas (i.e. **P** y **A**) como variables de efectos aleatorios. 
+
+
+&nbsp;
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+## dividido por poblacion
+ggplot(datos, aes(D, degradacion, color = P)) +
+  geom_point(alpha = 0.5,  show.legend = FALSE) + 
+  geom_smooth(method = "lm", show.legend = FALSE) + 
+  theme_bw()
+```
+
+**Figura 6**. Variación de la diversidad alélica (**D**) según la degradación del sitio (**degradacion**). Cada color representa una población diferente.
+
+&nbsp;
+
+Para esto el modelo se plantea de la siguiente manera:
+
+## Modelo 4. Andrea 
+
+```{r modelo, warning=FALSE, message=FALSE}
+## Modelo correcto: incluye la poblacion y el año como efecto aleatorio
+ mod1 <- glmer(D ~ degradacion + (1|P) + (1|A) + L, data = datos, family = "poisson")
+ summ(mod1)
+```
+
+&nbsp;
+
+**Interpretación:** Los resultados indican que todos los parámetros de degradación ambiental evaluados (H1, H2, H3, H4, H5), tienen un efecto significativo sobre la diversidad alélica (z = -2.89, p < 0.01) del complejo mayor de histocompatibilidad (CMH) clase I.
+
+&nbsp;
+
+### Corrección Modelo 4. Silvia 
+
+&nbsp;
+
+Según lo planteado para el uso del  Modelo 4, este  modelo es correcto si lo que deseamos es obtener  el efecto  que tienen todos los indicadores ambientales en conjunto sobre D. Sin embargo, la interpretación sobre su resultado es incorrecta y representa una trampa estadística de reporte selectivo. Debido a que se está reportando y asumiendo  que el efecto que tiene cada uno de los indicadores ambientales (H1, H2, H3, H4, H5) sobre  D es el mismo, cuando lo que se quiere averiguar es el efecto del mayor  eje de variación  **degradación** (determinado con un análisis de **PCA**) sobre nuestra variable D. Por lo tanto se debería concluir  que, de forma general, la diversidad alélica del complejo mayor de histocompatibilidad (CMH) clase I si es afectada por la degradación ambiental.  
+
+

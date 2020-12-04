@@ -1,7 +1,6 @@
 ---
 title: "Proyecto Final"
 author: "Silvia Chaves-Ramírez"
-date:  "`r Sys.Date()`"
 output:
   html_document:
     fig_caption: yes
@@ -22,20 +21,19 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Pregunta de investigación
 
-¿El tamaño de los ámbitos de descanso de los grupos  *Thyroptera tricolor*  esta infuenciado por el tamaño del grupo?  
+&nbsp;
+
+¿El tamaño de los ámbitos de descanso de los grupos  *Thyroptera tricolor* está infuenciado por el tamaño del grupo?  
 
 
-*Thyroptera tricolor* es una  especie de murciélago que forma grupos sociales para refugiarse. Ésta especie utiliza hojas tubulares en crecimiento del orden zingiberales como refugio, y al ser éste un recurso efímero,sus ocupantes deben a buscar un nuevo refugio diariamente.
- Estudios anteriores han demostrado que los grupos de *T.tricolor* mantienen pequeños ámbitos de descanso con alta disponibilidad de refugios [@Vonhof2004].
+*Thyroptera tricolor* es una  especie de murciélago que forma grupos sociales para refugiarse [@Chaverri2010]. Esta especie utiliza hojas tubulares en crecimiento del orden zingiberales como refugio [@Findley1974], al ser éstas un recurso efímero,sus ocupantes se ven obligados a buscar un nuevo refugio diariamente.Estudios anteriores han demostrado que los grupos de *T.tricolor* mantienen pequeños ámbitos de descanso con alta disponibilidad de refugios [@Vonhof2004].También existe evidencia de que cuando se elimina un pache utilizado por un grupo, este no utilizan los parches ocupados por sus vecinos y prefieren viajar lejos en busca de hojas disponibles [@Chaverri2011a]. Estos patrones sugieren que *T.tricolor* es una especie territorial, sin embargo, hasta la fecha no existe ningún estudio que ponga a prueba esta  hipóstesis.Por lo que es necesario entender mejor los patrones de uso del espacio para refugiarse y estudiar como estos pueden ser afectados por el tamaño de los grupos y así como la disponibilidad de los refugios. 
  
-Por lo que se sugiere que esta especie de murciélago es territorial. hasta el momento no existe ningún estudio que ponga a prueba esta  hipóstesis. Por lo que es necesario entender como afecta la disponibilidad de refugios en la superposición de ambitos de  descanso  y se deconoce  varían en tamaño los ámbitos de descanso según el número de individuos que conforman cada grupo.
- 
 
-Para este  proyecto de investigación  voy a simular la disponibilidad de refugios  para *T. tricolor* en un hábitat  y apartir de ahí  voy a extraer datos espaciales simulados de recapturas de grupos de murciélagos en los refugios. Luego voy a estimar los ámbitos de descanso para diferentes grupos.Por último  voy aplicar un modelo lineal para determinar el efecto del tamaño del grupo sobre el tamaño de los ámbitos de descanso. 
+Para este  proyecto de investigación voy  enfocarme  en entender como el tamaño del grupo puede afectar los patrones de uso del espacio. Para lo cual voy a simular la disponibilidad de refugios  para *T. tricolor* en un hábitat  y apartir de ahí  voy a extraer datos espaciales simulados de recapturas de grupos de murciélagos en los refugios. Luego voy a estimar los ámbitos de descanso para diferentes grupos.Por último  voy aplicar un modelo lineal para determinar el efecto del tamaño del grupo sobre el tamaño de los ámbitos de descanso. 
 
-# Hipótesis  y  predicción 
+---
 
-En animales territoriales los grupos más numerosos de ocupan ámbitos de hogar más grandes y con mayor cantidad de recursos, ya que al ser más numerosos pueden defender mejor un área.
+**Hipótesis**: En animales territoriales los grupos más numerosos  suelen ocupar ámbitos de hogar más grandes y con mayor cantidad de recursos, ya que al ser más numerosos pueden defender mejor un área.
 
 **Predicción:** Si *T.tricolor* es una especie territorial, espero encontrar que entre más grande sea el grupo mayor será el ámbito de descanso.
 
@@ -43,7 +41,7 @@ En animales territoriales los grupos más numerosos de ocupan ámbitos de hogar 
 
 # Diagrama causal  
 
-Quiero conocer el efecto del tamaño del grupo sobre el tamaño de los ámbitos de descanso de los grupos de *Thyroptera tricolor* (AD).Sin embargo se que la disponibilidad  de refugios(H) también podría estar influenciando el tamaño de los ámbitos de descanso en esta especie.  
+Quiero conocer el efecto directo del tamaño del grupo sobre el tamaño de los ámbitos de descanso de los grupos de *Thyroptera tricolor* (AD).Sin embargo, la disponibilidad de refugios(H) en el ambiente, también podría estar influenciando  positivamente el tamaño de los ámbitos de descanso en esta especie.  
 ```{r, echo=FALSE, warning = FALSE, message = FALSE}
 # install_github("jtextor/dagitty/r")
 require(dagitty)
@@ -53,10 +51,6 @@ require(ggdag)
 
 # install.packages("wesanderson")
 require(wesanderson)
-
-
-
-
 #Modelo con un DAG:
   
 # x = H
@@ -87,22 +81,20 @@ ggdag(dag1, layout = "circle") + theme_dag()
 
 # Código de  simulación 
 
-
-```{r, warning = FALSE, message = FALSE}
-# Se cargan los paquetes necesarios para los análisis  
-
-library(adehabitatHR) # Home Range Estimation 
-library(ggplot2)
-
-```
-
+&nbsp;
 
 ### Simulación de hábitat para grupos de *T.tricolor*. 
  
 Para simular datos aleatorios que similares al patrón  de distribución de hojas disponibles como refugios y las ubicaciones  de grupos de *T.tricolor*  observado en la naturaleza, apliqué un movimiento Browniano estandar, como se detalla a continuación:
 
 
-```{r Habitat}
+```{r Habitat, warning = FALSE, message = FALSE}
+# Se cargan los paquetes necesarios para los análisis  
+
+
+library(adehabitatHR) # Home Range Estimation 
+library(ggplot2)
+library(gridExtra)
 
 #Funciones-----------
 
@@ -264,7 +256,7 @@ leaf_coors <- sim_habitat(n_leaves = 1000, plot = FALSE)
 sims <- ubi_groups(leaf_coors = leaf_coors, groups = 10, radius_constant = 6)
 
 tab <- table(sims$id)
-## Esto es para obtener el numero de hojas  que  hay en cada territorio 
+
 sims <- sims[!sims$id %in% names(tab[tab < 5]), ]
 
 #  Se crea un set de datos  que contiene el área del ámbito de descanso y el número de individuos para cada grupo 
@@ -274,11 +266,13 @@ range_and_size <- get_home_range(X = sims)
 
 # Análisis 
 
-Para determinar el efecto  que tiene  el tamaño  del grupo sobre el tamaño de los ámbitos de descanso de *t.tricolor* realicé modelo lineal utilizando como variable de respuesta el tamaño del ámbito de descanso y como variable predictora el número de individuos que componen los grupos . Luego apliqué un el mismo modelo para un submuestreo de 30 reubicaciones, con el fin de verificar si el patrón obtenido se mantiene con  el mínimo de reubicaciones recomendadas para los anamisis de  estimación de ambitos de Hogar utilizando modelos probabilidad de desnidad de kernel.
+&nbsp;
+ 
+Para determinar el efecto  que tiene  el tamaño  del grupo sobre el tamaño de los ámbitos de descanso de *T.tricolor* realicé modelo lineal utilizando como variable de respuesta el tamaño del ámbito de descanso y como variable predictora el número de individuos que componen los grupos. Luego apliqué  el mismo modelo para un submuestreo de 30 reubicaciones, con el fin de verificar si el patrón obtenido se mantiene con el mínimo de reubicaciones recomendadas para los análisis de  estimación de ámbitos de hogar utilizando modelos probabilidad de densidad de kernel.
 
 
 
-```{r, echo= FALSE, fig.align='center', warning = FALSE, message = FALSE}
+```{r, fig.align='center', warning = FALSE, message = FALSE}
 mod <- lm(area ~ group_size, data = range_and_size)
 summary(mod)
 
@@ -289,39 +283,42 @@ summary(mod)
 ```{r, echo=FALSE, warning = FALSE, message = FALSE}
 resamp_sims <- resample_leaves(sims, n = 30)
 
-
 table(resamp_sims$id)
 
-#  
 resample_range_and_size <- get_home_range(X = resamp_sims)
 mod2 <- lm(area ~ group_size, data = resample_range_and_size)
 summary(mod2)
 
 
 ```
-# Interpretación de resultados 
+# Interpretación de resultados
 
-Los análsis realizados demuestran que  el número de individuos 
-```{r echo=FALSE, warning = FALSE, message = FALSE}
+Los análsis realizados demuestran que existe una la relación positiva entre el tamaño de los ámbitos de descanso y el número de individuos de los grupos (F= 31.64, p < 0.05), aún cuando se disminuye el número de puntos de reubicaciones a 30, (F= 14.35, p < 0.05). Por los tanto grupos más grande pueden defender areas más grandes y posiblemente  con mayor cantidad de refugios disponibles.
 
-ggplot(range_and_size, aes(group_size, area)) +
+```{r echo=FALSE,fig.align='center',warning = FALSE, message = FALSE}
+
+p1 <- ggplot(range_and_size, aes(group_size, area)) +
  geom_point(aes(group_size, area)) +
  geom_smooth(method ="lm") +
+ ggtitle("A") +
+ xlab("Número de individuos") + 
+ ylab("Tamaño del ámbito de descanso") +
+ scale_color_gradient() +
+ theme_bw()
+p2 <- ggplot(resample_range_and_size, aes(group_size, area)) +
+ geom_point(aes(group_size, area)) +
+ geom_smooth(method ="lm") +
+ ggtitle("B")+
  xlab("Número de individuos") + 
  ylab("Tamaño del ámbito de descanso") +
  scale_color_gradient() +
  theme_bw()
 
-ggplot(resample_range_and_size, aes(group_size, area)) +
- geom_point(aes(group_size, area)) +
- geom_smooth(method ="lm") +
- xlab("Número de individuos") + 
- ylab("Tamaño del ámbito de descanso") +
- scale_color_gradient() +
- theme_bw()
+grid.arrange(p1, p2, ncol= 2, nrow=1)
 ```
 
-**Figura.1**. Relación entre el número de individuos para diferentes grupos  y el tamaño de sus ámbitos de descanso correspondientes.
+**Figura.1**.A y B muestran la relación entre el número de individuos y el tamaño de sus ámbitos de descanso . En B se representa el submuestreo con un tamaño de muestra de 30. Las lineas azules representan la tendencia general de los datos y las bandas sombreadas el intervalo de confianza al 95%.
+
 
 ```{r, include=FALSE}
 
@@ -376,7 +373,10 @@ ggplot(resample_range_and_size, aes(group_size, area)) +
 
 
 ```
-# Referencias 
+### Referencias 
+
+&nbsp;
+
 
 ```{r  include=FALSE}
 sessionInfo()
