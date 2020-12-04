@@ -1,5 +1,0 @@
-"0","sims <- ubi_groups(leaf_coors = leaf_coors, groups = 10, radius_constant = 6)
-"
-"2","Error in ubi_groups(leaf_coors = leaf_coors, groups = 10, radius_constant = 6) : 
-  no se pudo encontrar la función ""ubi_groups""
-"

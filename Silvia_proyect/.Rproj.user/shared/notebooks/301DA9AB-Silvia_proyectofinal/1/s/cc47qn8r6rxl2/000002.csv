@@ -1,0 +1,48 @@
+"0","# install_github(""jtextor/dagitty/r"")"
+"0","require(dagitty)"
+"2","Loading required package: dagitty
+"
+"0","# install.packages(""ggdag"")"
+"0","require(ggdag)"
+"2","Loading required package: ggdag
+"
+"2","Loading required package: ggplot2
+"
+"2","package ‘ggplot2’ was built under R version 4.0.3"
+"2","
+Attaching package: ‘ggdag’
+
+"
+"2","The following object is masked from ‘package:stats’:
+
+    filter
+
+"
+"0","# install.packages(""wesanderson"")"
+"0","require(wesanderson)"
+"2","Loading required package: wesanderson
+"
+"0","#Modelo con un DAG:"
+"0","  "
+"0","# x = H"
+"0","# z = TG"
+"0","# y = AD"
+"0",""
+"0","# Crear DAG"
+"0","dag1 <- dagify(AD ~ TG,"
+"0","                   AD~ H,"
+"0","                   exposure = ""TG"","
+"0","                   outcome = ""AD"")"
+"0",""
+"0","# compactar"
+"0","tidy_dagitty(dag1)"
+"1","[38;5;246m# A DAG with 3 nodes and 2 edges
+[39m"
+"1","[38;5;246m#
+[39m"
+"1","[38;5;246m# Exposure: TG
+[39m"
+"1","[38;5;246m# Outcome: AD
+[39m"
+"1","[38;5;246m#
+[39m"
